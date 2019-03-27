@@ -10,6 +10,7 @@ import UIKit
 
 protocol HeroListTableViewManagerDelegate: class {
     func didSelectedItemAtIndex(_ index: Int)
+    func isReachingEndOfList()
 }
 
 final class HeroListTableViewManager: NSObject, UITableViewDelegate, UITableViewDataSource {
@@ -50,6 +51,12 @@ final class HeroListTableViewManager: NSObject, UITableViewDelegate, UITableView
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.didSelectedItemAtIndex(indexPath.row)
+    }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == data.count - 4 {
+            delegate?.isReachingEndOfList()
+        }
     }
 
 }

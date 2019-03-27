@@ -20,9 +20,9 @@ extension UIImageView {
                 return
             }
             if let data = data {
-                DispatchQueue.main.async(execute: {
+                DispatchQueue.main.async {
                     self.image = UIImage(data: data)
-                })
+                }
             } else {
                 print("Image data is invalid")
             }

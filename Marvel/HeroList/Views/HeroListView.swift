@@ -16,6 +16,7 @@ enum HeroListViewState {
 
 protocol HeroListViewDelegate: class {
     func didSelectItemAtIndex(index: Int)
+    func isReachingEndOfList()
 }
 
 final class HeroListView: UIView {
@@ -29,18 +30,25 @@ final class HeroListView: UIView {
         super.init(frame: .zero)
         setupView()
         self.tableViewManager.delegate = self
+        backgroundColor = UIColor.white
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(style: .gray)
+    let activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .gray)
+        activityIndicator.startAnimating()
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        return activityIndicator
+    }()
 
     let statusLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.darkGray
         label.text = "Couldn't load heroes"
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
@@ -52,7 +60,8 @@ final class HeroListView: UIView {
 
     let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
-        searchBar.placeholder = "Search for the name of your favourite Marvel hero..."
+        searchBar.searchBarStyle = .prominent
+        searchBar.placeholder = "Search a hero by name..."
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
@@ -63,7 +72,8 @@ extension HeroListView: ViewConfiguration {
         addSubview(activityIndicator)
         addSubview(statusLabel)
         addSubview(tableView)
-        addSubview(searchBar)
+        tableView.tableHeaderView = searchBar
+        tableView.tableFooterView = activityIndicator
     }
 
     func setupConstraints() {
@@ -71,8 +81,10 @@ extension HeroListView: ViewConfiguration {
             statusLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             statusLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
 
-            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
+            activityIndicator.heightAnchor.constraint(equalToConstant: 44),
+            activityIndicator.widthAnchor.constraint(equalTo: tableView.widthAnchor),
+//            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+//            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
 
             searchBar.leadingAnchor.constraint(equalTo: leadingAnchor),
             searchBar.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -87,6 +99,10 @@ extension HeroListView: ViewConfiguration {
 }
 
 extension HeroListView: HeroListTableViewManagerDelegate {
+    func isReachingEndOfList() {
+        delegate?.isReachingEndOfList()
+    }
+
     func didSelectedItemAtIndex(_ index: Int) {
         delegate?.didSelectItemAtIndex(index: index)
     }

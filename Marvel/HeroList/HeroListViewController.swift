@@ -31,6 +31,10 @@ final class HeroListViewController: UIViewController {
 
     override func viewDidLoad() {
         heroListView.setState(state: .loadingData)
+        fetchHeroes()
+    }
+
+    func fetchHeroes() {
         repository.fetchHeroes { result in
             switch result {
             case let .success(heroes):
@@ -38,18 +42,20 @@ final class HeroListViewController: UIViewController {
                     let thumbnail = "\(hero.thumbnail.path).\(hero.thumbnail.thumbnailExtension)"
                     return HeroCellViewModel(heroName: hero.name, heroThumbnail: thumbnail, favorited: false)
                 })
-                  DispatchQueue.main.async {
                 self.heroListView.setState(state: .dataLoaded(viewModels))
-                }
             case .failure(let error):
                 self.heroListView.setState(state: .errorOnLoad)
             }
         }
     }
-    
+
 }
 
 extension HeroListViewController: HeroListViewDelegate {
+    func isReachingEndOfList() {
+        fetchHeroes()
+    }
+
     func didSelectItemAtIndex(index: Int) {
 
     }

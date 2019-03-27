@@ -17,14 +17,20 @@ class HeroListRepository {
 
     var currentPage = 0
     let limit = 20
+    var isRequestingHeroes = false
 
     init(provider: MarvelService = MarvelServiceProvider()) {
         self.provider = provider
     }
 
     func fetchHeroes(result: @escaping (Result<[MarvelHero], Error>) -> Void) {
+        guard !isRequestingHeroes else {
+            return
+        }
         let offset = currentPage * limit
+        isRequestingHeroes = true
         provider.fetchHeroes(offset: offset, limit: limit, nameStartsWith: nil) { requestResult in
+            self.isRequestingHeroes = false
             switch requestResult {
             case let .success(data):
                 do {

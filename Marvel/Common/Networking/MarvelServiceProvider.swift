@@ -18,7 +18,7 @@ struct MarvelRequest {
     let path: String
     let params: [String: String]
     var url: String {
-            return baseUrl + path
+        return baseUrl + path
     }
     func apiKeyHash(timestamp: String) -> String {
         return "\(timestamp)\(Keys.Marvel.privateKey)\(Keys.Marvel.publicKey)".md5Value
@@ -29,7 +29,10 @@ struct MarvelServiceProvider: MarvelService {
 
     private func marvelRequest(_ request: MarvelRequest, result: @escaping (Result<Data, Error>) -> Void) {
         guard var urlComponents = URLComponents(string: request.url) else {
-            return result(.failure(MarvelServiceError.invalidUrl))
+            DispatchQueue.main.async {
+                result(.failure(MarvelServiceError.invalidUrl))
+            }
+            return
         }
 
         let timestamp = "\(Date().currentTimeMillis())"
@@ -44,15 +47,19 @@ struct MarvelServiceProvider: MarvelService {
         })
 
         guard let url = urlComponents.url else {
-            result(.failure(MarvelServiceError.malformedUrl))
+            DispatchQueue.main.async {
+                result(.failure(MarvelServiceError.malformedUrl))
+            }
             return
         }
 
         URLSession.shared.dataTask(with: url) { data, _, error in
-            if let error = error {
-                result(.failure(error))
-            } else if let data = data {
-                result(.success(data))
+            DispatchQueue.main.async {
+                if let error = error {
+                    result(.failure(error))
+                } else if let data = data {
+                    result(.success(data))
+                }
             }
             }.resume()
     }
