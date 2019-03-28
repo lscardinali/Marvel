@@ -29,7 +29,7 @@ final class HeroListView: UIView {
         self.tableViewManager = HeroListTableViewManager(tableview: tableView)
         super.init(frame: .zero)
         setupView()
-        self.tableViewManager.delegate = self
+        tableViewManager.delegate = self
         backgroundColor = UIColor.white
     }
 
@@ -41,6 +41,12 @@ final class HeroListView: UIView {
         let activityIndicator = UIActivityIndicatorView(style: .gray)
         activityIndicator.startAnimating()
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        return activityIndicator
+    }()
+
+    let tableViewActivityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .gray)
+        activityIndicator.startAnimating()
         return activityIndicator
     }()
 
@@ -58,22 +64,14 @@ final class HeroListView: UIView {
         return tableView
     }()
 
-    let searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
-        searchBar.searchBarStyle = .prominent
-        searchBar.placeholder = "Search a hero by name..."
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        return searchBar
-    }()
 }
 
 extension HeroListView: ViewConfiguration {
     func buildViewHierarchy() {
+        addSubview(tableView)
         addSubview(activityIndicator)
         addSubview(statusLabel)
-        addSubview(tableView)
-        tableView.tableHeaderView = searchBar
-        tableView.tableFooterView = activityIndicator
+        tableView.tableFooterView = tableViewActivityIndicator
     }
 
     func setupConstraints() {
@@ -81,30 +79,17 @@ extension HeroListView: ViewConfiguration {
             statusLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             statusLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
 
-            activityIndicator.heightAnchor.constraint(equalToConstant: 44),
-            activityIndicator.widthAnchor.constraint(equalTo: tableView.widthAnchor),
-//            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
-//            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
+            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
 
-            searchBar.leadingAnchor.constraint(equalTo: leadingAnchor),
-            searchBar.trailingAnchor.constraint(equalTo: trailingAnchor),
-            searchBar.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            tableViewActivityIndicator.heightAnchor.constraint(equalToConstant: 55),
+            tableViewActivityIndicator.widthAnchor.constraint(equalTo: tableView.widthAnchor),
 
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor),
             tableView.topAnchor.constraint(equalTo: topAnchor)
             ])
-    }
-}
-
-extension HeroListView: HeroListTableViewManagerDelegate {
-    func isReachingEndOfList() {
-        delegate?.isReachingEndOfList()
-    }
-
-    func didSelectedItemAtIndex(_ index: Int) {
-        delegate?.didSelectItemAtIndex(index: index)
     }
 }
 
@@ -125,5 +110,15 @@ extension HeroListView {
             statusLabel.isHidden = false
             activityIndicator.isHidden = true
         }
+    }
+}
+
+extension HeroListView: HeroListTableViewManagerDelegate {
+    func isReachingEndOfList() {
+        delegate?.isReachingEndOfList()
+    }
+
+    func didSelectedItemAtIndex(_ index: Int) {
+        delegate?.didSelectItemAtIndex(index: index)
     }
 }

@@ -19,6 +19,8 @@ class HeroListRepository {
     let limit = 20
     var isRequestingHeroes = false
 
+    private var currentHeroes: [MarvelHero] = []
+
     init(provider: MarvelService = MarvelServiceProvider()) {
         self.provider = provider
     }
@@ -36,6 +38,23 @@ class HeroListRepository {
                 do {
                     let parsedResponse = try JSONDecoder().decode(MarvelResponse.self, from: data)
                     self.currentPage += 1
+                    self.currentHeroes.append(contentsOf: parsedResponse.data.results)
+                    result(.success(self.currentHeroes))
+                } catch {
+                    result(.failure(HeroListRepositoryError.unableToLoadHeroes))
+                }
+            case let .failure(error):
+                result(.failure(error))
+            }
+        }
+    }
+
+    func searchForHero(name: String, result: @escaping (Result<[MarvelHero], Error>) -> Void) {
+        provider.fetchHeroes(offset: 0, limit: limit, nameStartsWith: name) { requestResult in
+            switch requestResult {
+            case let .success(data):
+                do {
+                    let parsedResponse = try JSONDecoder().decode(MarvelResponse.self, from: data)
                     result(.success(parsedResponse.data.results))
                 } catch {
                     result(.failure(HeroListRepositoryError.unableToLoadHeroes))

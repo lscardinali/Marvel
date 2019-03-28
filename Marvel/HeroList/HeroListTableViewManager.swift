@@ -34,7 +34,7 @@ final class HeroListTableViewManager: NSObject, UITableViewDelegate, UITableView
     }
 
     func updateData(_ newData: [HeroCellViewModel]) {
-        data.append(contentsOf: newData)
+        data = newData
         tableview.reloadData()
     }
 
