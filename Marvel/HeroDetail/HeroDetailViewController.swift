@@ -18,13 +18,16 @@ final class HeroDetailViewController: UIViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
-    }
-
-    override func viewDidLoad() {
-        print("load")
+        heroDetailView.delegate = self
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension HeroDetailViewController: HeroDetailViewDelegate {
+    func didTapCloseButton() {
+        dismiss(animated: true, completion: nil)
     }
 }

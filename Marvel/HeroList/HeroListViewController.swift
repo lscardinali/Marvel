@@ -11,19 +11,17 @@ import UIKit
 final class HeroListViewController: UIViewController {
 
     let heroListView = HeroListView()
-
     let repository: HeroListRepository
-
     let transition = PopAnimator()
-
     let heroSearchController = UISearchController(searchResultsController: nil)
 
-    var searchingForHero = false
+    var searchQuery: String?
 
     init(repository: HeroListRepository = HeroListRepository()) {
         self.repository = repository
         super.init(nibName: nil, bundle: nil)
         heroListView.delegate = self
+        heroSearchController.searchBar.delegate = self
         heroSearchController.searchResultsUpdater = self
         heroSearchController.obscuresBackgroundDuringPresentation = false
         heroSearchController.searchBar.placeholder = "Search hero by name"
@@ -46,55 +44,50 @@ final class HeroListViewController: UIViewController {
     }
 
     func fetchHeroes() {
-        repository.fetchHeroes { result in
-            self.processResult(result)
+        repository.fetchHeroes(nameStartsWith: searchQuery) { result in
+            switch result {
+            case let .success(heroes):
+                self.heroListView.setState(state: .dataLoaded(heroes))
+            case .failure:
+                self.heroListView.setState(state: .errorOnLoad)
+            }
         }
     }
-
-    func searchForHero(name: String) {
-        self.heroListView.setState(state: .loadingData)
-        repository.searchForHero(name: name) { result in
-            self.processResult(result)
-        }
-    }
-
-    func processResult(_ result: Result<[MarvelHero], Error>) {
-        switch result {
-        case let .success(heroes):
-            let viewModels = self.parseHeroesToViewModel(heroes: heroes)
-            self.heroListView.setState(state: .dataLoaded(viewModels))
-        case .failure:
-            self.heroListView.setState(state: .errorOnLoad)
-        }
-    }
-
-    func parseHeroesToViewModel(heroes: [MarvelHero]) -> [HeroCellViewModel] {
-        return heroes.map({ hero in
-            let thumbnail = "\(hero.thumbnail.path).\(hero.thumbnail.thumbnailExtension)"
-            return HeroCellViewModel(heroName: hero.name, heroThumbnail: thumbnail, favorited: false)
-        })
-    }
-
 }
 
-extension HeroListViewController: UISearchResultsUpdating {
+extension HeroListViewController: UISearchResultsUpdating, UISearchBarDelegate {
     func updateSearchResults(for searchController: UISearchController) {
         if let heroName = searchController.searchBar.text, heroName.count > 3 {
-            searchForHero(name: heroName)
-        }
-    }
-}
-
-extension HeroListViewController: HeroListViewDelegate {
-
-    func isReachingEndOfList() {
-        if !searchingForHero {
+            self.searchQuery = heroName
+            self.heroListView.setState(state: .loadingData)
+            self.repository.resetResults()
             fetchHeroes()
         }
     }
 
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+         searchQuery = nil
+        self.heroListView.setState(state: .loadingData)
+        self.repository.resetResults()
+        fetchHeroes()
+    }
+
+}
+
+extension HeroListViewController: HeroListViewDelegate {
+    func didFavouriteItemAtIndex(_ index: Int) {
+        repository.toggleFavoriteHeroAtIndex(index)
+        heroListView.setState(state: .dataLoaded(repository.currentResults))
+    }
+
+    func isReachingEndOfList() {
+        fetchHeroes()
+    }
+
     func didSelectItemAtIndex(index: Int) {
         let detail = HeroDetailViewController()
+
+//        navigationController?.pushViewController(detail, animated: true)
         detail.transitioningDelegate = self
         present(detail, animated: true, completion: nil)
     }
@@ -105,10 +98,11 @@ extension HeroListViewController: UIViewControllerTransitioningDelegate {
     func animationController(forPresented presented: UIViewController,
                              presenting: UIViewController,
                              source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        transition.originFrame = self.heroListView.tableView.superview!.convert(heroListView.tableView.frame, to: nil)
-//        transition.presenting = true
-//        heroListView.tableView.isHidden = true
+        //        transition.originFrame = self.heroListView.tableView.superview!.convert(heroListView.tableView.frame, to: nil)
+        //        transition.presenting = true
+        //        heroListView.tableView.isHidden = true
         return transition
+//        return nil
     }
 
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {

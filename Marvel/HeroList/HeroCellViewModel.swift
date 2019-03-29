@@ -9,6 +9,7 @@
 import Foundation
 
 struct HeroCellViewModel {
+    let id: Int
     let heroName: String
     let heroThumbnail: String
     let favorited: Bool

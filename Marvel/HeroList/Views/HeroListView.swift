@@ -16,21 +16,26 @@ enum HeroListViewState {
 
 protocol HeroListViewDelegate: class {
     func didSelectItemAtIndex(index: Int)
+    func didFavouriteItemAtIndex(_ index: Int)
     func isReachingEndOfList()
 }
 
 final class HeroListView: UIView {
 
     weak var delegate: HeroListViewDelegate?
-
-    let tableViewManager: HeroListTableViewManager
+    var data: [HeroCellViewModel] = []
 
     init() {
-        self.tableViewManager = HeroListTableViewManager(tableview: tableView)
         super.init(frame: .zero)
         setupView()
-        tableViewManager.delegate = self
+        registerCells()
+        tableView.delegate = self
+        tableView.dataSource = self
         backgroundColor = UIColor.white
+    }
+
+    func registerCells() {
+        tableView.register(cellType: HeroTableViewCell.self)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -104,7 +109,8 @@ extension HeroListView {
             tableView.isHidden = false
             statusLabel.isHidden = true
             activityIndicator.isHidden = true
-            tableViewManager.updateData(viewModels)
+            data = viewModels
+            tableView.reloadData()
         case .errorOnLoad:
             tableView.isHidden = true
             statusLabel.isHidden = false
@@ -113,12 +119,36 @@ extension HeroListView {
     }
 }
 
-extension HeroListView: HeroListTableViewManagerDelegate {
-    func isReachingEndOfList() {
-        delegate?.isReachingEndOfList()
+extension HeroListView: UITableViewDelegate, UITableViewDataSource {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return data.count
     }
 
-    func didSelectedItemAtIndex(_ index: Int) {
-        delegate?.didSelectItemAtIndex(index: index)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: HeroTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        cell.setupCell(data[indexPath.row])
+        cell.delegate = self
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        delegate?.didSelectItemAtIndex(index: indexPath.row)
+    }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == data.count-1 {
+            delegate?.isReachingEndOfList()
+        }
+    }
+}
+
+extension HeroListView: HeroTableViewCellDelegate {
+    func didTapFavoriteButton(_ sender: HeroTableViewCell) {
+        guard let index = tableView.indexPath(for: sender)?.row else {
+            return
+        }
+        delegate?.didFavouriteItemAtIndex(index)
+        tableView.reloadData()
     }
 }

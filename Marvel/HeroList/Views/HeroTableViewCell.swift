@@ -8,11 +8,13 @@
 
 import UIKit
 
-protocol HeroTableViewCellDelegate {
-    func didTapFavoriteButton()
+protocol HeroTableViewCellDelegate: class {
+    func didTapFavoriteButton(_ sender: HeroTableViewCell)
 }
 
 final class HeroTableViewCell: UITableViewCell, Reusable {
+
+    weak var delegate: HeroTableViewCellDelegate?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -53,6 +55,11 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
         heroNameLabel.text = model.heroName
         heroThumbnail.imageFromURL(urlString: model.heroThumbnail)
         favoriteButton.isSelected = model.favorited
+        favoriteButton.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchDown)
+    }
+
+    @objc private func didTapFavoriteButton() {
+        delegate?.didTapFavoriteButton(self)
     }
 
     override func prepareForReuse() {
@@ -65,7 +72,7 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
 extension HeroTableViewCell: ViewConfiguration {
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            heroThumbnail.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            heroThumbnail.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             heroThumbnail.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             heroThumbnail.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
 

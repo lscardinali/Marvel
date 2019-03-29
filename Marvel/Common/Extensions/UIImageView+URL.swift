@@ -14,7 +14,7 @@ extension UIImageView {
             print("Failed to create url \(urlString)")
             return
         }
-        URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
             if let error = error {
                 print(error)
                 return

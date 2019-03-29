@@ -6,14 +6,12 @@
 //  Copyright © 2019 Lucas Salton Cardinali. All rights reserved.
 //
 
-import Foundation
-
-struct MarvelResponse: Codable {
+struct MarvelHeroResponse: Codable {
     let code: Int
-    let data: MarvelResponseData
+    let data: MarvelHeroResponseData
 }
 
-struct MarvelResponseData: Codable {
+struct MarvelHeroResponseData: Codable {
     let offset, limit, total, count: Int
     let results: [MarvelHero]
 }
@@ -22,32 +20,14 @@ struct MarvelHero: Codable {
     let id: Int
     let name, description: String
     let thumbnail: Thumbnail
-    let resourceURI: String
-    let comics, series: Comics
-    let stories: Stories
-    let events: Comics
+    let comics, series, stories, events: MarvelContent
 }
 
-struct Comics: Codable {
-    let available: Int
-    let collectionURI: String
-    let items: [ComicsItem]
-    let returned: Int
+struct MarvelContent: Codable {
+    let items: [MarvelContentItem]
 }
 
-struct ComicsItem: Codable {
-    let resourceURI: String
-    let name: String
-}
-
-struct Stories: Codable {
-    let available: Int
-    let collectionURI: String
-    let items: [StoriesItem]
-    let returned: Int
-}
-
-struct StoriesItem: Codable {
+struct MarvelContentItem: Codable {
     let resourceURI: String
     let name: String
 }
