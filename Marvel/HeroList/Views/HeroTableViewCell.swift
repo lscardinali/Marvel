@@ -18,7 +18,6 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        accessoryType = .disclosureIndicator
         setupView()
     }
 
@@ -53,7 +52,7 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
 
     func setupCell(_ model: HeroCellViewModel) {
         heroNameLabel.text = model.heroName
-        heroThumbnail.imageFromURL(urlString: model.heroThumbnail)
+        heroThumbnail.from(urlString: model.heroThumbnail, placeholder: #imageLiteral(resourceName: "Avatar"))
         favoriteButton.isSelected = model.favorited
         favoriteButton.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchDown)
     }
@@ -61,22 +60,20 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
     @objc private func didTapFavoriteButton() {
         delegate?.didTapFavoriteButton(self)
     }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        heroThumbnail.image = #imageLiteral(resourceName: "Avatar")
-    }
-
 }
 
 extension HeroTableViewCell: ViewConfiguration {
+
+    func setupView() {
+        buildViewHierarchy()
+        setupConstraints()
+    }
+
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            heroThumbnail.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            heroThumbnail.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             heroThumbnail.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             heroThumbnail.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-
-            heroThumbnail.heightAnchor.constraint(equalToConstant: 42),
             heroThumbnail.widthAnchor.constraint(equalToConstant: 42),
 
             heroThumbnail.trailingAnchor.constraint(equalTo: heroNameLabel.leadingAnchor, constant: -16),
@@ -84,11 +81,14 @@ extension HeroTableViewCell: ViewConfiguration {
             heroNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             heroNameLabel.trailingAnchor.constraint(equalTo: favoriteButton.leadingAnchor, constant: -16),
 
-            favoriteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            favoriteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            favoriteButton.heightAnchor.constraint(equalToConstant: 42),
-            favoriteButton.widthAnchor.constraint(equalToConstant: 42)
+            favoriteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            favoriteButton.topAnchor.constraint(equalTo: contentView.topAnchor),
+            favoriteButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            favoriteButton.widthAnchor.constraint(equalToConstant: 64)
             ])
+        let heightConstraint = heroThumbnail.heightAnchor.constraint(equalToConstant: 42)
+        heightConstraint.priority = UILayoutPriority(rawValue: 999)
+        heightConstraint.isActive = true
     }
 
     func buildViewHierarchy() {

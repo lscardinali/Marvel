@@ -20,14 +20,14 @@ struct MarvelHero: Codable {
     let id: Int
     let name, description: String
     let thumbnail: Thumbnail
-    let comics, series, stories, events: MarvelContent
+    let comics, series, stories, events: MarvelContentEntry
 }
 
-struct MarvelContent: Codable {
-    let items: [MarvelContentItem]
+struct MarvelContentEntry: Codable {
+    let items: [MarvelContentEntryItem]
 }
 
-struct MarvelContentItem: Codable {
+struct MarvelContentEntryItem: Codable {
     let resourceURI: String
     let name: String
 }

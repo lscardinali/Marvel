@@ -3,7 +3,7 @@
 //  Marvel
 //
 //  Created by Lucas Salton Cardinali on 27/03/19.
-//  Extracted from: https://stackoverflow.com/questions/46376823/ios-swift-get-the-current-local-time-and-date-timestamp/46390754
+//  From: https://stackoverflow.com/questions/46376823/ios-swift-get-the-current-local-time-and-date-timestamp/46390754
 //
 
 import Foundation

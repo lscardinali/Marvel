@@ -16,8 +16,6 @@ final class HeroDetailHeaderCell: UITableViewCell, Reusable {
 
     weak var delegate: HeroDetailHeaderCellDelegate?
 
-    var hasGradient = false
-
     private let heroThumbnail: UIImageView = {
         let imageView = UIImageView()
         imageView.image = #imageLiteral(resourceName: "Avatar")
@@ -37,14 +35,13 @@ final class HeroDetailHeaderCell: UITableViewCell, Reusable {
 
     private let heroNameLabel: UILabel = {
         let label = UILabel()
-        label.text = "HERO NAME"
         label.font = UIFont.boldSystemFont(ofSize: 22)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
     private let informationView: UIVisualEffectView = {
-        let blur = UIBlurEffect(style: .light)
+        let blur = UIBlurEffect(style: .regular)
         let blurView = UIVisualEffectView(effect: blur)
         blurView.translatesAutoresizingMaskIntoConstraints = false
         return blurView
@@ -56,11 +53,17 @@ final class HeroDetailHeaderCell: UITableViewCell, Reusable {
     }
 
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setupView()
+        fatalError("init(coder:) has not been implemented")
     }
 
-    func setupCell() {
+    func setupCell(from viewModel: HeroDetailViewModel) {
+        heroNameLabel.text = viewModel.name
+        heroThumbnail.from(urlString: viewModel.thumbnail, placeholder: #imageLiteral(resourceName: "Avatar"))
+        favoriteButton.isSelected = viewModel.favorited
+    }
+
+    @objc private func didTapFavoriteButton() {
+        delegate?.didTapFavoriteButton(self)
     }
 }
 
@@ -101,5 +104,6 @@ extension HeroDetailHeaderCell: ViewConfiguration {
         buildViewHierarchy()
         setupConstraints()
         selectionStyle = .none
+        favoriteButton.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchDown)
     }
 }

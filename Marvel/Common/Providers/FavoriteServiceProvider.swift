@@ -15,7 +15,7 @@ class FavoriteServiceProvider: FavoriteService {
     init(userDefaults: UserDefaults = UserDefaults.standard) {
         self.userDefaults = userDefaults
     }
-    
+
     func isFavorited(id: Int) -> Bool {
         return userDefaults.bool(forKey: "\(id)")
     }

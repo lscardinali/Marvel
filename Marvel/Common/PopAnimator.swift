@@ -10,7 +10,7 @@ import UIKit
 
 class PopAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 
-    let duration = 1.0
+    let duration = 0.5
     var presenting = true
     var originFrame = CGRect.zero
 
@@ -49,11 +49,9 @@ class PopAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         }
 
         containerView.addSubview(toView)
-
         containerView.bringSubviewToFront(detailView)
 
-        UIView.animate(withDuration: duration, delay:0.0,
-                       usingSpringWithDamping: 0.4, initialSpringVelocity: 0.0,
+        UIView.animate(withDuration: duration,
                        animations: {
                         detailView.transform = self.presenting ?
                             CGAffineTransform.identity : scaleTransform

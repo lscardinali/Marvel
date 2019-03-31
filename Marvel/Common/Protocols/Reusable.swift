@@ -4,18 +4,16 @@
 //
 //  Created by Lucas Salton Cardinali on 26/03/19.
 //  Copyright (c) 2016 AliSoftware
-//  Extracted from: https://github.com/AliSoftware/Reusable/blob/master/Sources/View/Reusable.swift
-
+//  From: https://github.com/AliSoftware/Reusable/blob/master/Sources/View/Reusable.swift
+//
 
 import UIKit
 
 public protocol Reusable: class {
-    /// The reuse identifier to use when registering and later dequeuing a reusable cell
     static var reuseIdentifier: String { get }
 }
 
 public extension Reusable {
-    /// By default, use the name of the class as String for its reuseIdentifier
     static var reuseIdentifier: String {
         return String(describing: self)
     }

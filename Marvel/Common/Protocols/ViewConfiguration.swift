@@ -13,10 +13,3 @@ protocol ViewConfiguration: class {
     func buildViewHierarchy()
     func setupView()
 }
-
-extension ViewConfiguration {
-    func setupView() {
-        buildViewHierarchy()
-        setupConstraints()
-    }
-}

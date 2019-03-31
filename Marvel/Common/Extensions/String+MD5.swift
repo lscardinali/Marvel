@@ -3,11 +3,10 @@
 //  Marvel
 //
 //  Created by Lucas Salton Cardinali on 27/03/19.
-//  Extracted from: https://stackoverflow.com/questions/32163848/how-can-i-convert-a-string-to-an-md5-hash-in-ios-using-swift
+//  From: https://stackoverflow.com/questions/32163848/how-can-i-convert-a-string-to-an-md5-hash-in-ios-using-swift
 //
 
 import Foundation
-
 import CommonCrypto
 
 extension String {
@@ -18,7 +17,6 @@ extension String {
         if let tempDigest = self.data(using: .utf8) {
             _ = tempDigest.withUnsafeBytes { body -> String in
                 CC_MD5(body.baseAddress, CC_LONG(tempDigest.count), &digest)
-
                 return ""
             }
         }

@@ -1,31 +1,35 @@
 //
-//  UIImageView+Network.swift
+//  UIImageView+NetworkCache.swift
 //  Marvel
 //
 //  Created by Lucas Salton Cardinali on 27/03/19.
-//  Copyright © 2019 Lucas Salton Cardinali. All rights reserved.
+//  From: https://gist.github.com/wongandydev/35c4599ec8f060e8f5537e2ef86d1df0#file-uiimageview-extension-swift
 //
 
 import UIKit
 
+let imageCache = NSCache<AnyObject, AnyObject>()
+
 extension UIImageView {
-    public func imageFromURL(urlString: String) {
-        guard let url = URL(string: urlString) else {
-            print("Failed to create url \(urlString)")
+    func from(urlString: String, placeholder: UIImage? = nil) {
+        let url = URL(string: urlString)
+
+        image = placeholder
+
+        if let imageFromCache = imageCache.object(forKey: urlString as AnyObject) as? UIImage {
+            self.image = imageFromCache
             return
         }
-        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
-            if let error = error {
-                print(error)
-                return
-            }
-            if let data = data {
+
+        URLSession.shared.dataTask(with: url!) {
+            data, _, _ in
+            if data != nil {
                 DispatchQueue.main.async {
-                    self.image = UIImage(data: data)
+                    let imageToCache = UIImage(data: data!)
+                    imageCache.setObject(imageToCache!, forKey: urlString as AnyObject)
+                    self.image = imageToCache
                 }
-            } else {
-                print("Image data is invalid")
             }
-        }).resume()
+            }.resume()
     }
 }

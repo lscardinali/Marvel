@@ -11,7 +11,8 @@ import UIKit
 enum HeroListViewState {
     case loadingData
     case dataLoaded([HeroCellViewModel])
-    case errorOnLoad
+    case loadingMoreData
+    case errorOnLoad(String)
 }
 
 protocol HeroListViewDelegate: class {
@@ -42,16 +43,11 @@ final class HeroListView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    let activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(style: .gray)
-        activityIndicator.startAnimating()
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        return activityIndicator
-    }()
+    let loadingHUD: LoadingHUD = LoadingHUD()
 
     let tableViewActivityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(style: .gray)
-        activityIndicator.startAnimating()
+        activityIndicator.hidesWhenStopped = true
         return activityIndicator
     }()
 
@@ -72,11 +68,18 @@ final class HeroListView: UIView {
 }
 
 extension HeroListView: ViewConfiguration {
+
+    func setupView() {
+        buildViewHierarchy()
+        setupConstraints()
+    }
+
     func buildViewHierarchy() {
         addSubview(tableView)
-        addSubview(activityIndicator)
+        addSubview(loadingHUD)
         addSubview(statusLabel)
         tableView.tableFooterView = tableViewActivityIndicator
+        bringSubviewToFront(loadingHUD)
     }
 
     func setupConstraints() {
@@ -84,11 +87,8 @@ extension HeroListView: ViewConfiguration {
             statusLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             statusLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
 
-            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
-
-            tableViewActivityIndicator.heightAnchor.constraint(equalToConstant: 55),
-            tableViewActivityIndicator.widthAnchor.constraint(equalTo: tableView.widthAnchor),
+            loadingHUD.centerXAnchor.constraint(equalTo: centerXAnchor),
+            loadingHUD.centerYAnchor.constraint(equalTo: centerYAnchor),
 
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -103,18 +103,27 @@ extension HeroListView {
         switch state {
         case .loadingData:
             tableView.isHidden = true
-            activityIndicator.isHidden = false
+            loadingHUD.isHidden = false
             statusLabel.isHidden = true
+            tableViewActivityIndicator.stopAnimating()
         case .dataLoaded(let viewModels):
             tableView.isHidden = false
             statusLabel.isHidden = true
-            activityIndicator.isHidden = true
+            loadingHUD.isHidden = true
             data = viewModels
             tableView.reloadData()
-        case .errorOnLoad:
+            tableViewActivityIndicator.stopAnimating()
+        case .errorOnLoad(let error):
+            statusLabel.text = error
             tableView.isHidden = true
             statusLabel.isHidden = false
-            activityIndicator.isHidden = true
+            loadingHUD.isHidden = true
+            tableViewActivityIndicator.stopAnimating()
+        case .loadingMoreData:
+            tableView.isHidden = false
+            statusLabel.isHidden = true
+            loadingHUD.isHidden = true
+            tableViewActivityIndicator.startAnimating()
         }
     }
 }
@@ -134,6 +143,7 @@ extension HeroListView: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.didSelectItemAtIndex(index: indexPath.row)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

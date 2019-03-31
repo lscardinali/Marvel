@@ -15,16 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        window = UIWindow(frame: UIScreen.main.bounds)
-
-        //TODO: Refactor this out
-
-        let heroListViewController = HeroListViewController()
-        let navigationController = UINavigationController(rootViewController: heroListViewController)
-        navigationController.navigationBar.prefersLargeTitles = true
-
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        self.window = window
+        AppConfigurator().configure(window: window)
         return true
     }
 
