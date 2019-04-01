@@ -15,7 +15,7 @@ MARVEL is an iOS app that lets you search for your favorite Marvel Heroes.
 - The layers are normally divided between: `View`, `View Controller`, `Repository` and `ServiceProvider`.
 - Data flows using `Codable` models and `ViewModels`.
 
-![architecture](https://raw.githubusercontent.com/lscardinali/Marvel/master/Marvel/Docs/architecture.jpeg?raw=true)
+![architecture](https://github.com/lscardinali/Marvel/blob/master/Docs/architecture.jpeg?raw=true)
 
 ### View
 
