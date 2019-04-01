@@ -67,7 +67,7 @@ final class HeroRepository {
                 do {
                     let parsedResults = try JSONDecoder().decode(MarvelHeroResponse.self, from: marvelResponse)
                     if parsedResults.data.results.isEmpty ||
-                        parsedResults.data.results.count < self.limit {
+                        parsedResults.data.total <= self.limit {
                         self.hasReachedEnd = true
                     }
                     self.currentPage += 1

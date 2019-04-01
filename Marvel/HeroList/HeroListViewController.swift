@@ -35,7 +35,6 @@ final class HeroListViewController: UIViewController {
     private func commonInit() {
         heroListView.delegate = self
         heroSearchController.searchBar.delegate = self
-        heroSearchController.searchResultsUpdater = self
         heroSearchController.obscuresBackgroundDuringPresentation = false
         heroSearchController.searchBar.placeholder = "Search hero by name"
         navigationItem.searchController = heroSearchController
@@ -74,9 +73,11 @@ final class HeroListViewController: UIViewController {
     }
 }
 
-extension HeroListViewController: UISearchResultsUpdating, UISearchBarDelegate {
-    func updateSearchResults(for searchController: UISearchController) {
-        if let heroName = searchController.searchBar.text, heroName.count > 3 {
+extension HeroListViewController: UISearchBarDelegate {
+
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        if let heroName = searchBar.text, heroName.count > 3 {
             repository.resetResults(newSearchQuery: heroName)
             fetchHeroes()
         }
