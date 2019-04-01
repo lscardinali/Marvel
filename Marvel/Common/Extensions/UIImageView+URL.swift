@@ -21,8 +21,7 @@ extension UIImageView {
             return
         }
 
-        URLSession.shared.dataTask(with: url!) {
-            data, _, _ in
+        URLSession.shared.dataTask(with: url!) { data, _, _ in
             if data != nil {
                 DispatchQueue.main.async {
                     let imageToCache = UIImage(data: data!)

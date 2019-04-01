@@ -8,7 +8,7 @@
 
 import Foundation
 
-class HeroRepository {
+final class HeroRepository {
 
     private let marvelProvider: MarvelService
     private let favoriteProvider: FavoriteService

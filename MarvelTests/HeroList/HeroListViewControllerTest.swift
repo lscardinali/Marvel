@@ -74,8 +74,4 @@ class HeroListViewControllerTest: XCTestCase {
         sut.heroSearchController.searchBar.delegate?.searchBarCancelButtonClicked?(sut.heroSearchController.searchBar)
         XCTAssertEqual(sutView.tableView.numberOfRows(inSection: 0), 5)
     }
-
-    
-
-
 }

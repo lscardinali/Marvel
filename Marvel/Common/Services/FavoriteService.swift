@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol FavoriteService: class {
+protocol FavoriteService {
     func isFavorited(id: Int) -> Bool
     func favoriteHero(id: Int)
     func unfavoriteHero(id: Int)

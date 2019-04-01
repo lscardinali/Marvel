@@ -76,7 +76,7 @@ class HeroRepositoryTest: XCTestCase {
             case .success:
                 XCTFail("Should not succeed")
             case let .failure(error):
-                XCTAssert(error is Error)
+                XCTAssertNotNil(error)
             }
         }
     }

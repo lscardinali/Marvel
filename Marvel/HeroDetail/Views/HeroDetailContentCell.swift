@@ -62,6 +62,7 @@ extension HeroDetailContentCell: ViewConfiguration {
     func setupView() {
         buildViewHierarchy()
         setupConstraints()
+        accessibilityIdentifier = "HeroDetailContentCell"
         selectionStyle = .none
     }
 
@@ -70,7 +71,6 @@ extension HeroDetailContentCell: ViewConfiguration {
             contentThumbnail.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             contentThumbnail.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
             contentThumbnail.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16),
-            contentThumbnail.heightAnchor.constraint(equalToConstant: 150),
             contentThumbnail.widthAnchor.constraint(equalToConstant: 100),
 
             contentTitleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
@@ -83,6 +83,9 @@ extension HeroDetailContentCell: ViewConfiguration {
             contentDescriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             contentDescriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16)
             ])
+        let heightConstraint = contentThumbnail.heightAnchor.constraint(equalToConstant: 150)
+        heightConstraint.priority = UILayoutPriority(rawValue: 999)
+        heightConstraint.isActive = true
     }
 
     func buildViewHierarchy() {

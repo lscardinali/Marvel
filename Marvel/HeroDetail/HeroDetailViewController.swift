@@ -10,22 +10,31 @@ import UIKit
 
 final class HeroDetailViewController: UIViewController {
 
-    let heroDetailView: HeroDetailView
+    let heroDetailView = HeroDetailView()
     let repository: HeroDetailRepository
 
     override func loadView() {
         self.view = heroDetailView
     }
 
-    init(repository: HeroDetailRepository, view: HeroDetailView = HeroDetailView()) {
+    init(repository: HeroDetailRepository) {
         self.repository = repository
-        self.heroDetailView = view
         super.init(nibName: nil, bundle: nil)
-        heroDetailView.delegate = self
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupFavoriteButton()
+        self.title = repository.currentViewModel.name
+        heroDetailView.setState(.dataLoaded(repository.currentViewModel))
+        fetchHeroDetails()
+    }
+
+    func fetchHeroDetails() {
         heroDetailView.setState(.loadingData)
         repository.fetchHeroDetails { result in
             switch result {
@@ -37,18 +46,16 @@ final class HeroDetailViewController: UIViewController {
         }
     }
 
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func setupFavoriteButton() {
+        let favoriteButton = UIBarButtonItem(image: repository.currentViewModel.favorited ? #imageLiteral(resourceName: "Favorited") : #imageLiteral(resourceName: "Unfavorited"), style: .plain,
+                                             target: self, action: #selector(didTapFavoriteHero))
+        favoriteButton.accessibilityIdentifier = repository.currentViewModel.favorited ?
+            "FavoritedButton" : "UnfavoritedButton"
+        navigationItem.setRightBarButton(favoriteButton, animated: true)
     }
-}
 
-extension HeroDetailViewController: HeroDetailViewDelegate {
-    func didTapFavoriteHero() {
+    @objc private func didTapFavoriteHero() {
         repository.toggleFavoriteHero()
-        heroDetailView.setState(.dataLoaded(repository.currentViewModel))
-    }
-
-    func didTapCloseButton() {
-        dismiss(animated: true, completion: nil)
+        setupFavoriteButton()
     }
 }

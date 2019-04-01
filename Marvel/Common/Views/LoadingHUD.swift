@@ -10,6 +10,7 @@ import UIKit
 
 class LoadingHUD: UIVisualEffectView {
 
+    // MARK: Views
     let activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(style: .gray)
         activityIndicator.startAnimating()
@@ -17,6 +18,7 @@ class LoadingHUD: UIVisualEffectView {
         return activityIndicator
     }()
 
+    // MARK: Initialization
     init() {
         let effect = UIBlurEffect(style: .prominent)
         super.init(effect: effect)
@@ -46,6 +48,7 @@ extension LoadingHUD: ViewConfiguration {
     func setupView() {
         buildViewHierarchy()
         setupConstraints()
+        accessibilityIdentifier = "LoadingHUD"
         layer.cornerRadius = 8
         clipsToBounds = true
         translatesAutoresizingMaskIntoConstraints = false

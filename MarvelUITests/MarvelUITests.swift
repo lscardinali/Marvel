@@ -11,25 +11,68 @@ import XCTest
 class MarvelUITests: XCTestCase {
 
     var app: XCUIApplication!
+    let heroCellIdentifier = "HeroTableViewCell"
+    let heroDetailCellIdentifier = "HeroDetailHeaderCell"
+    let heroDetailContentCellIdentifier = "HeroDetailContentCell"
 
     override func setUp() {
         app = XCUIApplication()
-
-        continueAfterFailure = false
-
-        // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
+        continueAfterFailure = true
+        app.launchArguments.append("--uitesting")
         app.launch()
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
     func testHeroList() {
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        XCTAssert(app.otherElements["LoadingHUD"].isHittable)
+        XCTAssertTrue(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 10))
+        XCTAssert(app.cells.matching(identifier: heroCellIdentifier).count > 0)
+    }
+
+    func testHeroFavorite() {
+        XCTAssertTrue(app.buttons.matching(identifier: "FavoriteButton").firstMatch.waitForExistence(timeout: 10))
+        let favoriteButton = app.buttons.matching(identifier: "FavoriteButton").firstMatch
+        favoriteButton.tap()
+        XCTAssertTrue(favoriteButton.isSelected)
+        sleep(1)
+        favoriteButton.tap()
+        XCTAssertFalse(favoriteButton.isSelected)
+    }
+
+    func testHeroSearch() {
+        XCTAssert(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 10))
+        app.swipeDown()
+        app.searchFields.firstMatch.tap()
+        app.searchFields.firstMatch.typeText("Spider")
+        XCTAssert(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 15))
+        XCTAssert(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Spider'")).count > 0)
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cancel'")).firstMatch.tap()
+        XCTAssert(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 10))
+        XCTAssert(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH '3-D Man'")).count > 0)
+
+    }
+
+    func testHeroDetails() {
+        XCTAssert(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 10))
+        app.cells.matching(identifier: heroCellIdentifier).firstMatch.tap()
+        XCTAssert(app.cells.matching(identifier: heroDetailCellIdentifier).firstMatch.waitForExistence(timeout: 10))
+        app.swipeUp()
+        app.swipeDown()
+        XCTAssert(app.cells.matching(identifier: heroDetailCellIdentifier).count > 0)
+        XCTAssert(app.cells.matching(identifier: heroDetailContentCellIdentifier).count > 0)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssert(app.cells.matching(identifier: heroCellIdentifier).count > 0)
+    }
+
+    func testHeroDetailFavorite() {
+        XCTAssert(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 10))
+        app.cells.matching(identifier: heroCellIdentifier).firstMatch.tap()
+        XCTAssert(app.cells.matching(identifier: heroDetailCellIdentifier).firstMatch.waitForExistence(timeout: 10))
+        let unfavoritedButton = app.buttons.matching(identifier: "UnfavoritedButton").firstMatch
+        unfavoritedButton.tap()
+        XCTAssert(app.buttons.matching(identifier: "UnfavoritedButton").count == 0)
+        let favoritedButton = app.buttons.matching(identifier: "FavoritedButton").firstMatch
+        favoritedButton.tap()
+        XCTAssert(app.buttons.matching(identifier: "FavoritedButton").count == 0)
     }
 
 }

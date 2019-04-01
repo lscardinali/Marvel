@@ -8,7 +8,7 @@
 
 import Foundation
 
-class FavoriteServiceProvider: FavoriteService {
+struct FavoriteServiceProvider: FavoriteService {
 
     let userDefaults: UserDefaults
 
@@ -21,10 +21,12 @@ class FavoriteServiceProvider: FavoriteService {
     }
 
     func favoriteHero(id: Int) {
-        return userDefaults.set(true, forKey: "\(id)")
+        userDefaults.set(true, forKey: "\(id)")
+        userDefaults.synchronize()
     }
 
     func unfavoriteHero(id: Int) {
-        return userDefaults.removeObject(forKey: "\(id)")
+        userDefaults.removeObject(forKey: "\(id)")
+        userDefaults.synchronize()
     }
 }

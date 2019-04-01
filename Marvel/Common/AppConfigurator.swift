@@ -13,6 +13,7 @@ struct AppConfigurator {
         let heroListViewController = HeroListViewController()
         let navigationController = UINavigationController(rootViewController: heroListViewController)
         navigationController.navigationBar.prefersLargeTitles = true
+        navigationController.navigationBar.tintColor = UIColor.red
 
         window.rootViewController = navigationController
         window.makeKeyAndVisible()

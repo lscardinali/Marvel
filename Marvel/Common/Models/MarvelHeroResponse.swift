@@ -20,16 +20,6 @@ struct MarvelHero: Codable {
     let id: Int
     let name, description: String
     let thumbnail: Thumbnail
-    let comics, series, stories, events: MarvelContentEntry
-}
-
-struct MarvelContentEntry: Codable {
-    let items: [MarvelContentEntryItem]
-}
-
-struct MarvelContentEntryItem: Codable {
-    let resourceURI: String
-    let name: String
 }
 
 struct Thumbnail: Codable {

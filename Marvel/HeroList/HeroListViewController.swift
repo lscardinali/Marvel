@@ -12,12 +12,11 @@ final class HeroListViewController: UIViewController {
 
     private let repository: HeroRepository
     private let heroListView: HeroListView
-    private let transition = PopAnimator()
     let heroSearchController = UISearchController(searchResultsController: nil)
 
     var selectedIndex: Int = 0
 
-    // MARK: ViewController Initialization
+    // MARK: Initialization
     init(repository: HeroRepository = HeroRepository(), view: HeroListView = HeroListView()) {
         self.repository = repository
         self.heroListView = view
@@ -41,12 +40,20 @@ final class HeroListViewController: UIViewController {
         heroSearchController.searchBar.placeholder = "Search hero by name"
         navigationItem.searchController = heroSearchController
         definesPresentationContext = true
-        title = "Heroes"
+        title = "Marvel Heroes"
     }
 
-    // MARK: View Controller LifeCycle
+    // MARK: Life Cycle
     override func viewDidLoad() {
+        self.navigationController?.delegate = self
         fetchHeroes()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if !repository.currentViewModels().isEmpty {
+            heroListView.setState(state: .dataLoaded(repository.currentViewModels()))
+        }
     }
 
     func fetchHeroes() {
@@ -63,13 +70,6 @@ final class HeroListViewController: UIViewController {
             case .failure:
                 self.heroListView.setState(state: .errorOnLoad("There was a problem loading the heroes"))
             }
-        }
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if !repository.currentViewModels().isEmpty {
-            heroListView.setState(state: .dataLoaded(repository.currentViewModels()))
         }
     }
 }
@@ -105,25 +105,17 @@ extension HeroListViewController: HeroListViewDelegate {
         let hero = repository.heroAt(index: index)
         selectedIndex = index
         let detail = HeroDetailViewController(repository: HeroDetailRepository(hero: hero))
-        detail.transitioningDelegate = self
-        present(detail, animated: true, completion: nil)
+        navigationController?.pushViewController(detail, animated: true)
     }
 }
 
-extension HeroListViewController: UIViewControllerTransitioningDelegate {
-
-    func animationController(forPresented presented: UIViewController,
-                             presenting: UIViewController,
-                             source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+extension HeroListViewController: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController,
+                              animationControllerFor operation: UINavigationController.Operation,
+                              from fromVC: UIViewController,
+                              to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         let cellRect = self.heroListView.tableView.rectForRow(at: IndexPath(row: selectedIndex, section: 0))
         let frame = self.heroListView.tableView.convert(cellRect, to: self.heroListView)
-        transition.originFrame = CGRect(x: frame.width/2, y: frame.minY, width: 0, height: 0)
-        transition.presenting = true
-        return transition
-    }
-
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.presenting = false
-        return transition
+        return CellExpanderAnimator(originLocation: frame, presenting: operation == .push ? true : false)
     }
 }

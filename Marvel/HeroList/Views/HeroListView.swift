@@ -26,23 +26,7 @@ final class HeroListView: UIView {
     weak var delegate: HeroListViewDelegate?
     var data: [HeroCellViewModel] = []
 
-    init() {
-        super.init(frame: .zero)
-        setupView()
-        registerCells()
-        tableView.delegate = self
-        tableView.dataSource = self
-        backgroundColor = UIColor.white
-    }
-
-    func registerCells() {
-        tableView.register(cellType: HeroTableViewCell.self)
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
+    // MARK: Views
     let loadingHUD: LoadingHUD = LoadingHUD()
 
     let tableViewActivityIndicator: UIActivityIndicatorView = {
@@ -54,17 +38,31 @@ final class HeroListView: UIView {
     let statusLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.darkGray
-        label.text = "Couldn't load heroes"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
     let tableView: UITableView = {
         let tableView = UITableView()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 44
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
 
+    // MARK: Initialization
+    init() {
+        super.init(frame: .zero)
+        setupView()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func registerCells() {
+        tableView.register(cellType: HeroTableViewCell.self)
+    }
 }
 
 extension HeroListView: ViewConfiguration {
@@ -72,6 +70,10 @@ extension HeroListView: ViewConfiguration {
     func setupView() {
         buildViewHierarchy()
         setupConstraints()
+        registerCells()
+        tableView.delegate = self
+        tableView.dataSource = self
+        backgroundColor = UIColor.white
     }
 
     func buildViewHierarchy() {
@@ -155,10 +157,9 @@ extension HeroListView: UITableViewDelegate, UITableViewDataSource {
 
 extension HeroListView: HeroTableViewCellDelegate {
     func didTapFavoriteButton(_ sender: HeroTableViewCell) {
-        guard let index = tableView.indexPath(for: sender)?.row else {
-            return
+        if let index = tableView.indexPath(for: sender)?.row {
+            delegate?.didFavouriteItemAtIndex(index)
+            tableView.reloadData()
         }
-        delegate?.didFavouriteItemAtIndex(index)
-        tableView.reloadData()
     }
 }

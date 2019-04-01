@@ -15,7 +15,7 @@ enum HeroDetailsType {
     case events
 }
 
-class HeroDetailRepository {
+final class HeroDetailRepository {
 
     let marvelHero: MarvelHero
     let marvelProvider: MarvelService
@@ -48,12 +48,14 @@ class HeroDetailRepository {
 
     func fetchHeroDetails(result: @escaping (Result<HeroDetailViewModel, Error>) -> Void) {
         let requestGroup = DispatchGroup()
+        var requestError: Error?
+
         fetchComics(requestGroup: requestGroup) { requestResult in
             switch requestResult {
             case let .success(content):
                 self.currentViewModel.comics = self.parseToViewModel(content: content)
             case let .failure(error):
-                result(.failure(error))
+                requestError = error
             }
         }
 
@@ -62,7 +64,7 @@ class HeroDetailRepository {
             case let .success(content):
                 self.currentViewModel.stories = self.parseToViewModel(content: content)
             case let .failure(error):
-                result(.failure(error))
+                requestError = error
             }
         }
 
@@ -71,7 +73,7 @@ class HeroDetailRepository {
             case let .success(content):
                 self.currentViewModel.events = self.parseToViewModel(content: content)
             case let .failure(error):
-                result(.failure(error))
+                requestError = error
             }
         }
 
@@ -80,12 +82,16 @@ class HeroDetailRepository {
             case let .success(content):
                 self.currentViewModel.series = self.parseToViewModel(content: content)
             case let .failure(error):
-                result(.failure(error))
+                requestError = error
             }
         }
 
         requestGroup.notify(queue: .main) {
-            result(.success(self.currentViewModel))
+            if let error = requestError {
+                result(.failure(error))
+            } else {
+                result(.success(self.currentViewModel))
+            }
         }
     }
 
@@ -133,10 +139,9 @@ class HeroDetailRepository {
         requestGroup.leave()
     }
 
-
     func parseToViewModel(content: [MarvelContent]) -> [HeroDetailViewModelContent] {
         return content.map { content in
-            var thumbnail: String? = nil
+            var thumbnail: String?
             if let thumb = content.thumbnail {
                 thumbnail = "\(thumb.path).\(thumb.thumbnailExtension)"
             }

@@ -16,15 +16,7 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
 
     weak var delegate: HeroTableViewCellDelegate?
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupView()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
+    // MARK: Views
     let heroThumbnail: UIImageView = {
         let imageView = UIImageView()
         imageView.image = #imageLiteral(resourceName: "Avatar")
@@ -42,6 +34,7 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
 
     let favoriteButton: UIButton = {
         let button = UIButton()
+        button.accessibilityIdentifier = "FavoriteButton"
         button.setTitleColor(UIColor.red, for: .normal)
         button.tintColor = UIColor.red
         button.setImage(#imageLiteral(resourceName: "Unfavorited"), for: .normal)
@@ -49,6 +42,16 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+
+    // MARK: initialization
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupView()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     func setupCell(_ model: HeroCellViewModel) {
         heroNameLabel.text = model.heroName
@@ -65,6 +68,7 @@ final class HeroTableViewCell: UITableViewCell, Reusable {
 extension HeroTableViewCell: ViewConfiguration {
 
     func setupView() {
+        accessibilityIdentifier = "HeroTableViewCell"
         buildViewHierarchy()
         setupConstraints()
     }

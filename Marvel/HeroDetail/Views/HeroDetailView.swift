@@ -17,7 +17,6 @@ enum HeroDetailViewSections: Int {
 }
 
 protocol HeroDetailViewDelegate: class {
-    func didTapCloseButton()
     func didTapFavoriteHero()
 }
 
@@ -30,6 +29,7 @@ enum HeroDetailViewState {
 final class HeroDetailView: UIView {
 
     private let sections = 5
+
     weak var delegate: HeroDetailViewDelegate?
     var viewModel: HeroDetailViewModel?
 
@@ -46,15 +46,7 @@ final class HeroDetailView: UIView {
         return label
     }()
 
-    private let loadingHUD = LoadingHUD()
-
-    private let closeButton: UIButton = {
-        let button = UIButton()
-        button.setImage(#imageLiteral(resourceName: "Close"), for: .normal)
-        button.alpha = 0.7
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    let loadingHUD = LoadingHUD()
 
     init() {
         super.init(frame: .zero)
@@ -65,53 +57,51 @@ final class HeroDetailView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func registerCells() {
+    private func registerCells() {
         tableView.register(cellType: HeroDetailHeaderCell.self)
         tableView.register(cellType: HeroDetailContentCell.self)
     }
 
-    @objc private func didTapCloseButton() {
-        delegate?.didTapCloseButton()
+    private func viewModelForSection(_ section: HeroDetailViewSections) -> [HeroDetailViewModelContent]? {
+        switch section {
+        case .comics: return viewModel?.comics
+        case .events: return viewModel?.events
+        case .series: return viewModel?.series
+        case .stories: return viewModel?.stories
+        default: return nil
+        }
     }
 }
 
 extension HeroDetailView: ViewConfiguration {
 
-    internal func setupView() {
+    func setupView() {
         buildViewHierarchy()
         setupConstraints()
         registerCells()
-        tableView.alpha = 0
         tableView.delegate = self
         tableView.dataSource = self
         backgroundColor = UIColor.white
-        closeButton.addTarget(self, action: #selector(didTapCloseButton), for: .touchDown)
     }
 
-    internal func setupConstraints() {
+    func setupConstraints() {
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            tableView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: topAnchor),
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
             statusLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             statusLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-
-            closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            closeButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
-            closeButton.widthAnchor.constraint(equalToConstant: 32),
-            closeButton.heightAnchor.constraint(equalToConstant: 32),
 
             loadingHUD.centerXAnchor.constraint(equalTo: centerXAnchor),
             loadingHUD.centerYAnchor.constraint(equalTo: centerYAnchor)
             ])
     }
 
-    internal func buildViewHierarchy() {
+    func buildViewHierarchy() {
         addSubview(tableView)
         addSubview(loadingHUD)
-        addSubview(closeButton)
         addSubview(statusLabel)
         bringSubviewToFront(loadingHUD)
     }
@@ -126,7 +116,7 @@ extension HeroDetailView {
             statusLabel.isHidden = false
             statusLabel.text = error
         case .loadingData:
-            tableView.isHidden = true
+            tableView.isHidden = false
             loadingHUD.isHidden = false
             statusLabel.isHidden = true
         case let .dataLoaded(viewModel):
@@ -135,9 +125,6 @@ extension HeroDetailView {
             tableView.reloadData()
             loadingHUD.isHidden = true
             statusLabel.isHidden = true
-            UIView.animate(withDuration: 0.5) {
-                self.tableView.alpha = 1
-            }
         }
     }
 }
@@ -171,36 +158,18 @@ extension HeroDetailView: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let section = HeroDetailViewSections(rawValue: indexPath.section), let viewModel = viewModel else {
-            return UITableViewCell()
+            fatalError("Wrong section provided")
         }
         switch section {
         case .header:
             let cell: HeroDetailHeaderCell = tableView.dequeueReusableCell(for: indexPath)
             cell.setupCell(from: viewModel)
-            cell.delegate = self
             return cell
-        case .comics:
+        case .comics, .stories, .series, .events:
+            guard let sectionViewModel = viewModelForSection(section) else { fatalError("Content ViewModel not found") }
             let cell: HeroDetailContentCell = tableView.dequeueReusableCell(for: indexPath)
-            cell.setupCell(content: viewModel.comics[indexPath.row])
-            return cell
-        case .stories:
-            let cell: HeroDetailContentCell = tableView.dequeueReusableCell(for: indexPath)
-            cell.setupCell(content: viewModel.stories[indexPath.row])
-            return cell
-        case .series:
-            let cell: HeroDetailContentCell = tableView.dequeueReusableCell(for: indexPath)
-            cell.setupCell(content: viewModel.series[indexPath.row])
-            return cell
-        case .events:
-            let cell: HeroDetailContentCell = tableView.dequeueReusableCell(for: indexPath)
-            cell.setupCell(content: viewModel.events[indexPath.row])
+            cell.setupCell(content: sectionViewModel[indexPath.row])
             return cell
         }
-    }
-}
-
-extension HeroDetailView: HeroDetailHeaderCellDelegate {
-    func didTapFavoriteButton(_ sender: HeroDetailHeaderCell) {
-        delegate?.didTapFavoriteHero()
     }
 }

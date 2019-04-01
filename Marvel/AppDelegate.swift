@@ -15,6 +15,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        if CommandLine.arguments.contains("--uitesting"), let bundleIndentifier = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleIndentifier)
+            UserDefaults.standard.synchronize()
+        }
+
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
         AppConfigurator().configure(window: window)
