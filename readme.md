@@ -7,8 +7,6 @@ MARVEL is an iOS app that lets you search for your favorite Marvel Heroes.
 - The project doesn't use any third-party dependency manager or Libraries.
 - Requires Swift 5 and XCode 10.2 to run.
 
----
-
 ## Architecture
 
 - Built using MVC
@@ -46,8 +44,6 @@ MARVEL is an iOS app that lets you search for your favorite Marvel Heroes.
 - Since `Services` are protocols, they can be easily mocked.
 - Examples would be the `MarvelService` protocol that declares the interfaces for each needed request of the Marvel API. `MarvelServiceProvider` implements this protocol by providing the concrete networking implementation, while `MarvelServiceStubProvider` implements this protocol to allow mocking in Unit Testing
 
----
-
 # Tests
 
 #### Unit Tests (94.5% Coverage)
@@ -61,8 +57,6 @@ MARVEL is an iOS app that lets you search for your favorite Marvel Heroes.
 
 - Tested all of the use cases happy paths
 
----
-
 # Extensions
 
 - `UIImageView+URL`: allows `UIImageView` to load images from the network and cache them for later use
@@ -71,14 +65,10 @@ MARVEL is an iOS app that lets you search for your favorite Marvel Heroes.
 - `Reusable`: Makes `UITableViewCells` easier to manage, without the use String ReuseIdentifiers.
 - Its referenced in the file header if code has been extracted from Open-Source snippets.
 
----
-
 # Protocols
 
 - `ViewConfiguration`: defines some interfaces to make it easier to declare constraints, build the view hierarchy and View Setup
 - `EndpointType`: makes it easier to declare endpoints to be used with the `MarvelServiceProvider`
-
----
 
 # Services
 
