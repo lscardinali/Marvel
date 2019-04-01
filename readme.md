@@ -2,6 +2,8 @@
 
 MARVEL is an iOS app that lets you search for your favorite Marvel Heroes.
 
+[![Build Status](https://app.bitrise.io/app/457c0bd7f7ff750d/status.svg?token=xSvx1aYK3Cg6zYC2VdKJqg&branch=master)](https://app.bitrise.io/app/457c0bd7f7ff750d)
+
 ## Running the Project
 
 - The project doesn't use any third-party dependency manager or Libraries.
