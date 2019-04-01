@@ -59,7 +59,7 @@ class HeroListViewControllerTest: XCTestCase {
                                         favoriteProvider: FavoriteProviderStub())
         sut = HeroListViewController(repository: repository, view: sutView)
         sut.heroSearchController.searchBar.text = "Spider"
-        sut.heroSearchController.searchResultsUpdater?.updateSearchResults(for: sut.heroSearchController)
+        sut.heroSearchController.searchBar.delegate?.searchBarTextDidEndEditing?(sut.heroSearchController.searchBar)
         XCTAssertEqual(sutView.tableView.numberOfRows(inSection: 0), 5)
     }
 

@@ -35,7 +35,7 @@ class HeroRepositoryTest: XCTestCase {
             case let .success(viewModels):
                 XCTAssert(!viewModels.isEmpty)
                 XCTAssertEqual(self.sut.currentPage, 1)
-                XCTAssertTrue(self.sut.hasReachedEnd)
+                XCTAssertFalse(self.sut.hasReachedEnd)
                 XCTAssertFalse(self.sut.currentViewModels().isEmpty)
                 XCTAssertNotNil(self.sut.heroAt(index: 0))
                 XCTAssertEqual(self.sut.heroAt(index: 0).name, "3-D Man")

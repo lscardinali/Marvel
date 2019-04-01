@@ -41,8 +41,9 @@ class MarvelUITests: XCTestCase {
     func testHeroSearch() {
         XCTAssert(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 10))
         app.swipeDown()
-        app.searchFields.firstMatch.tap()
-        app.searchFields.firstMatch.typeText("Spider")
+        let searchField = app.searchFields.firstMatch
+        searchField.tap()
+        searchField.typeText("Spider\n")
         XCTAssert(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 15))
         XCTAssert(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Spider'")).count > 0)
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cancel'")).firstMatch.tap()

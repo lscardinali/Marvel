@@ -6,6 +6,7 @@ MARVEL is an iOS app that lets you search for your favorite Marvel Heroes.
 
 - The project doesn't use any third-party dependency manager or Libraries.
 - Requires Swift 5 and XCode 10.2 to run.
+- Swiftlint is configured to run if installed on the local machine.
 
 ## Architecture
 
