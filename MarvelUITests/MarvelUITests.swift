@@ -23,7 +23,6 @@ class MarvelUITests: XCTestCase {
     }
 
     func testHeroList() {
-        XCTAssert(app.otherElements["LoadingHUD"].isHittable)
         XCTAssertTrue(app.cells.matching(identifier: heroCellIdentifier).firstMatch.waitForExistence(timeout: 10))
         XCTAssert(app.cells.matching(identifier: heroCellIdentifier).count > 0)
     }
